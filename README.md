@@ -95,20 +95,20 @@ target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Werror -Wextra -Wpedantic)
 
 ```tree
 hypercube-raylib/
-├──  CMakeLists.txt
-├──  docs
-│   └──  preview.png
-├──  LICENSE
-├── 󰂺 README.md
-└── 󰣞 src
-    ├──  config.hpp
-    ├──  cube.cpp
-    ├──  cube.hpp
-    ├──  grid.cpp
-    ├──  grid.hpp
-    ├──  main.cpp
-    ├──  renderer.cpp
-    └──  renderer.hpp
+├── CMakeLists.txt
+├── docs
+│   └── preview.png
+├── LICENSE
+├── README.md
+└── src
+    ├── config.hpp
+    ├── cube.cpp
+    ├── cube.hpp
+    ├── grid.cpp
+    ├── grid.hpp
+    ├── main.cpp
+    ├── renderer.cpp
+    └── renderer.hpp
 ```
 
 ## Como funciona
