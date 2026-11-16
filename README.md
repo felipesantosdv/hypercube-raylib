@@ -124,5 +124,4 @@ Distribuído sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
 ## Créditos
 
 - Parte da lógica de projeção 4D → 3D foi baseada no vídeo
-["Building 3D Snake From Scratch in C++"]
-(<https://www.youtube.com/watch?v=f90_plD8LrA>) do canal Salar.
+["Building 3D Snake From Scratch in C++"](<https://www.youtube.com/watch?v=f90_plD8LrA>) do canal Salar.
