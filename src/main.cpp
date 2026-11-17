@@ -1,7 +1,7 @@
 #include "renderer.hpp"
 
 int main() {
-    rndr::Renderer renderer { };
+    rndr::Renderer renderer;
     renderer.run();
 
     return 0;

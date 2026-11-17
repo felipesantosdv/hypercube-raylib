@@ -9,22 +9,28 @@ namespace rndr {
 
 class Renderer {
    public:
-    static constexpr i32 HEIGHT = 720;
-    static constexpr i32 WIDTH = 1280;
-    static constexpr const char* TITLE = "Hypercube";
+    Renderer();
+    ~Renderer();
 
-    Renderer() = default;
-    ~Renderer() = default;
+    Renderer(const Renderer&) = delete;
+    Renderer& operator=(const Renderer&) = delete;
 
-    Camera3D createCamera();
     void run();
 
    private:
-    Grid mGrid { };
+    static constexpr i32 HEIGHT { 720 };
+    static constexpr i32 WIDTH { 1280 };
+    static constexpr const char* TITLE { "Hypercube" };
+    static constexpr u32 WINDOW_FLAGS { FLAG_MSAA_4X_HINT | FLAG_WINDOW_RESIZABLE };
+    static constexpr i32 TARGET_FPS { 60 };
 
-    void renderGrid();
-    void renderCell(GridPos position);
-    Vector3 getPosition(const GridPos& pos);
+    Camera3D mCamera { };
+    Mesh mCubeMesh { };
+    Shader mShader { };
+    Material mMaterial { };
+    Grid mGrid { };
+    Grid::Transforms mTransforms { };
+
 };
 
 }  // namespace rndr

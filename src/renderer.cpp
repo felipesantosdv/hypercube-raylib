@@ -1,57 +1,79 @@
 #include "renderer.hpp"
+
+#include <raylib.h>
+#include <rlgl.h>
+
+#include "config.hpp"
 #include "grid.hpp"
-#include "cube.hpp"
 
 namespace rndr {
 
-Camera3D Renderer::createCamera() {
-    Camera3D camera { };
+    Renderer::Renderer() {
+        SetConfigFlags(WINDOW_FLAGS);
+        InitWindow(WIDTH, HEIGHT, TITLE);
+        SetTargetFPS(TARGET_FPS);
 
-    float target { (Cube::CUBE_SIZE * Grid::GRID_SIZE + Cube::CUBE_SPACING * Grid::GRID_SIZE) / 2.0f };
-    camera.position = { 10.0f, 10.0f, 10.0f };
-    camera.target = { target, target, target };
-    camera.fovy = 60.0f;
-    camera.up = { 0.0f, 1.0f, 0.0f };
-    camera.projection = CAMERA_PERSPECTIVE;
+        f32 target { (Grid::Cube::SIZE * Grid::GRID_SIZE + Grid::Cube::SPACING * Grid::GRID_SIZE) / 2.0f };
+        mCamera.position = { 10.0f, 10.0f, 10.0f };
+        mCamera.target = { target, target, target };
+        mCamera.fovy = 60.0f;
+        mCamera.up = { 0.0f, 1.0f, 0.0f };
+        mCamera.projection = CAMERA_PERSPECTIVE;
 
-    return camera;
-}
+        Image original { LoadImage("assets/images/window_icon.png") };
+        ImageFormat(&original, PIXELFORMAT_UNCOMPRESSED_R8G8B8A8);
 
-void Renderer::renderGrid() {
-    mGrid.foreachCell([&](GridPos pos) {
-        renderCell(pos);
-    });
-}
+        Image icons[3] { ImageCopy(original), ImageCopy(original), ImageCopy(original) };
+        ImageResize(&icons[0], 16, 16);
+        ImageResize(&icons[1], 32, 32);
+        ImageResize(&icons[2], 64, 64);
 
-void Renderer::renderCell(GridPos position) {
-    DrawCube(getPosition(position), Cube::CUBE_SIZE, Cube::CUBE_SIZE, Cube::CUBE_SIZE, Fade(BLUE, 0.4f));
-}
+        SetWindowIcons(icons, 3);
 
-Vector3 Renderer::getPosition(const GridPos& pos) {
-    return Vector3 {
-        pos[0] * Cube::CUBE_SIZE + pos[0] * Cube::CUBE_SPACING,
-        pos[1] * Cube::CUBE_SIZE + pos[1] * Cube::CUBE_SPACING,
-        pos[2] * Cube::CUBE_SIZE + pos[2] * Cube::CUBE_SPACING,
-    };
-}
+        for (Image& img : icons) 
+            UnloadImage(img);
+        UnloadImage(original);
 
-void Renderer::run() {
-    InitWindow(WIDTH, HEIGHT, TITLE);
-    Camera3D camera { createCamera() };
-    SetTargetFPS(60);
+        mCubeMesh = GenMeshCube(Grid::Cube::SIZE, Grid::Cube::SIZE, Grid::Cube::SIZE);
 
-    while (!WindowShouldClose()) {
-        UpdateCamera(&camera, CAMERA_ORBITAL);
-        BeginDrawing();
+        mShader = LoadShader("assets/shaders/instancing.vs", "assets/shaders/instancing.fs");
+        if (!IsShaderValid(mShader)) {
+            TraceLog(LOG_ERROR, "Falha ao carregar shader de instancing");
+        }
+        mShader.locs[SHADER_LOC_MATRIX_MODEL] = GetShaderLocationAttrib(mShader, "instanceTransform");
 
-        ClearBackground(BLACK);
+        mMaterial = LoadMaterialDefault();
+        mMaterial.shader = mShader;
+        mMaterial.maps[MATERIAL_MAP_DIFFUSE].color = Fade(BLUE, 0.4f);
 
-        BeginMode3D(camera);
-        renderGrid();
-        EndMode3D();
-
-        EndDrawing();
+        mTransforms = mGrid.getTranforms();
     }
-}
+
+    Renderer::~Renderer() {
+        UnloadMesh(mCubeMesh);
+        UnloadMaterial(mMaterial);
+        CloseWindow();
+    }
+
+    void Renderer::run() {
+        while (!WindowShouldClose()) {
+            UpdateCamera(&mCamera, CAMERA_ORBITAL);
+            BeginDrawing();
+
+            ClearBackground(BLACK);
+
+            BeginMode3D(mCamera);
+            rlDisableDepthMask();
+            DrawMeshInstanced(mCubeMesh, mMaterial, mTransforms.data(), static_cast<i32>(mTransforms.size()));
+            rlEnableDepthMask();
+            EndMode3D();
+
+            #ifndef NDEBUG
+            DrawFPS(10, 10);
+            #endif
+
+            EndDrawing();
+        }
+    }
 
 }  // namespace rndr
