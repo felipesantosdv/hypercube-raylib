@@ -93,6 +93,12 @@ hypercube-raylib/
 ├── CMakeLists.txt
 ├── docs
 │   └── preview.png
+├── assets
+│   ├── images
+│   │   └── window_icon.png
+│   └── shaders
+│       ├── instancing.fs
+│       └── instancing.vs
 ├── LICENSE
 ├── README.md
 └── src
