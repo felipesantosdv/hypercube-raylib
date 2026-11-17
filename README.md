@@ -18,15 +18,6 @@ nome do projeto. A cena é um cubo 3D grande formado por uma grade de cubos meno
 
 ### Dependências do sistema
 
-#### Debian/Ubuntu
-
-```bash
-sudo apt update
-sudo apt install build-essential cmake ninja-build git \
-    libasound2-dev libx11-dev libxrandr-dev libxi-dev \
-    libgl1-mesa-dev libglu1-mesa-dev libxcursor-dev libxinerama-dev
-```
-
 #### Arch Linux
 
 O raylib está disponível no repositório `extra`, então o CMake o encontra
@@ -81,11 +72,15 @@ project(hypercube LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-set(SOURCES src/main.cpp src/cube.cpp src/grid.cpp src/renderer.cpp)
+set(SOURCES src/main.cpp src/grid.cpp src/renderer.cpp)
 
 find_package(raylib REQUIRED)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_SOURCE_DIR}/assets $<TARGET_FILE_DIR:${PROJECT_NAME}>/assets)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Werror -Wextra -Wpedantic)
@@ -102,8 +97,6 @@ hypercube-raylib/
 ├── README.md
 └── src
     ├── config.hpp
-    ├── cube.cpp
-    ├── cube.hpp
     ├── grid.cpp
     ├── grid.hpp
     ├── main.cpp
